@@ -1,0 +1,17 @@
+position,measure,value,units
+short FX call,delta,-6169027.8,CAD per unit of USD/CAD spot
+short FX call,gamma,-1.835782e+08,CAD per squared unit of USD/CAD spot
+short FX call,vega,-40707.379,CAD per volatility point
+short FX call,theta,513.48905,CAD per calendar day
+short FX put,delta,8672069.8,CAD per unit of USD/CAD spot
+short FX put,gamma,-1.835782e+08,CAD per squared unit of USD/CAD spot
+short FX put,vega,-40707.379,CAD per volatility point
+short FX put,theta,1656.6043,CAD per calendar day
+GoC 5Y,parallel DV01,1384.8975,CAD per bp
+GoC 5Y,5Y key-rate DV01,1320.6355,CAD per bp
+GoC 5Y,10Y key-rate DV01,0,CAD per bp
+GoC 5Y,parallel convexity,22.395084,years squared
+GoC 10Y,parallel DV01,1670.9254,CAD per bp
+GoC 10Y,5Y key-rate DV01,141.49759,CAD per bp
+GoC 10Y,10Y key-rate DV01,1483.1832,CAD per bp
+GoC 10Y,parallel convexity,78.111638,years squared

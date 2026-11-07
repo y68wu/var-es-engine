@@ -1,0 +1,26 @@
+{
+  "retrieved_utc": "2026-11-07T06:10:31+00:00",
+  "requested_start": "2007-01-01",
+  "requested_end_inclusive": "2026-10-21",
+  "sample_first_date": "2007-02-13",
+  "sample_last_date": "2026-10-21",
+  "sample_observations": 4888,
+  "market_csv_sha256": "3a0e158a75167c70d72408f9a187cf5f6686df62d2b7814c727c9dca3b747012",
+  "software": {
+    "pandas": "3.1.1",
+    "yfinance": "1.8.0"
+  },
+  "sources": {
+    "xiu": "Yahoo Finance XIU.TO adjusted close via yfinance",
+    "usdcad": "Yahoo Finance USDCAD=X close via yfinance",
+    "goc_zero_coupon_curve": "https://www.bankofcanada.ca/stats/results/csv?lookupPage=lookup_yield_curve.php&startRange=1986-01-01&searchRange=&dFrom=2007-01-01&dTo=2026-10-21",
+    "corra": "https://www.bankofcanada.ca/valet/observations/AVG.INTWO/json?start_date=2006-12-25&end_date=2026-10-21",
+    "usd_3m_treasury": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO&cosd=2006-12-25&coed=2026-10-21"
+  },
+  "alignment": "Joint XIU, USD/CAD and GoC curve dates; CORRA and DGS3MO taken from strictly prior observations up to seven calendar days old.",
+  "fx_volatility": {
+    "decay": 0.94,
+    "warmup_returns": 30,
+    "sessions_per_year": 252
+  }
+}
