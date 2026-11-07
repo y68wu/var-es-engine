@@ -1,5 +1,7 @@
 # CAD multi-asset VaR / ES engine
 
+[Open the interactive case study](https://y68wu.github.io/var-es-engine/) · [Read the four-week project handbook](https://y68wu.github.io/var-es-engine/handbook.html)
+
 **Delta-normal put 99% one-day VaR at CAD 125.7k, 4.3% below Gaussian full revaluation (CAD 131.2k).** On identical Gaussian paths, linear P&L gave CAD 127.9k versus CAD 131.2k with full revaluation. In the control book without options, linear P&L slightly overstated VaR. The snapshot uses the October 21, 2026 close.
 
 Across 750 out-of-sample observations, delta-normal produced 12 exceptions, historical simulation 8 and Student-t Monte Carlo 9. All models were green in the final 250 observations, while the Christoffersen independence test flagged exception clustering over the full period.
@@ -72,6 +74,24 @@ Hypotheticals shift the CAD zero curve and CAD option discount proxy up 200 bp, 
 | March 2020, worst close | 2.76 |
 | 2022 rate hikes, worst close | 2.46 |
 | Combined hypothetical | 2.51 |
+
+## Independent data checks
+
+The [market context report](reports/context.json) cross-checks Yahoo's USD/CAD closes against the Bank of Canada's independent daily average. Across 2,432 matched sessions, the median absolute spot gap was 18 bp, but the same-date log return correlation was only 0.37. The report shows how that correlation changes when the series are aligned one joint session apart. Provider timestamps matter when building a daily risk panel.
+
+Using the most recent prior VIX close and an illustrative threshold of 20, realized loss exceeded delta-normal VaR on 6 of 623 days below the threshold (0.96%) and 6 of 127 days at or above it (4.72%). This descriptive split uses the original forecasts and different sample sizes. See the [BoC exchange rate series](https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates/) and [Cboe VIX via FRED](https://fred.stlouisfed.org/series/VIXCLS).
+
+## Website
+
+GitHub Pages serves the static files in `docs/`. The case study uses the committed summary tables and a precomputed grid of exact portfolio valuations for its FX shock lab. The four-week handbook maps 28 illustrative calendar dates to decisions, implementation steps and checks in the repository.
+
+After running the analysis above, regenerate the supplementary report and the site's data file.
+
+```bash
+python -m var_es.context
+python -m var_es.site
+python -m http.server 8000 --directory docs
+```
 
 ## Limitations
 

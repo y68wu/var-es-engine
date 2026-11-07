@@ -1,0 +1,130 @@
+{
+  "retrieved_utc": "2026-11-07T06:25:13+00:00",
+  "sources": [
+    {
+      "id": "FXUSDCAD",
+      "provider": "Bank of Canada Valet",
+      "label": "USD/CAD indicative daily average",
+      "url": "https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates/",
+      "download_url": "https://www.bankofcanada.ca/valet/observations/FXUSDCAD/json?start_date=2017-01-01&end_date=2026-10-21",
+      "response_sha256": "ce56ade1555f392e531e890949562ba4d6e6b87fbbc0b87a567e818eab3fcd4b"
+    },
+    {
+      "id": "VIXCLS",
+      "provider": "Cboe via FRED",
+      "label": "Cboe Volatility Index daily close",
+      "url": "https://fred.stlouisfed.org/series/VIXCLS",
+      "download_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS&cosd=2023-10-04&coed=2026-10-20",
+      "response_sha256": "c596e23c2deed53bda6648b0fce3d2cea145d98a60b2db6b48d83d936017a912"
+    }
+  ],
+  "fx_validation": {
+    "start_date": "2017-01-03",
+    "end_date": "2026-10-21",
+    "overlap_days": 2432,
+    "return_observations": 2431,
+    "return_correlation": 0.3659830242065405,
+    "mean_abs_return_gap_bp": 33.56901266517498,
+    "median_abs_spot_gap_bp": 17.97805396002161,
+    "p95_abs_spot_gap_bp": 63.48998094246405,
+    "lag_return_observations": 2429,
+    "lag_correlations": [
+      {
+        "yahoo_offset_sessions": -1,
+        "correlation": -0.015691913344339746
+      },
+      {
+        "yahoo_offset_sessions": 0,
+        "correlation": 0.3661300438383935
+      },
+      {
+        "yahoo_offset_sessions": 1,
+        "correlation": 0.7485883831165122
+      }
+    ]
+  },
+  "vix_regimes": {
+    "threshold": 20,
+    "max_age_days": 7,
+    "start_date": "2023-10-11",
+    "end_date": "2026-10-21",
+    "matched_days": 750,
+    "unmatched_days": 0,
+    "groups": [
+      {
+        "id": "below_20",
+        "label": "VIX below 20",
+        "days": 623,
+        "models": [
+          {
+            "method": "historical",
+            "exceptions": 3,
+            "exception_rate": 0.004815409309791332,
+            "mean_var_99": 230170.74019293737
+          },
+          {
+            "method": "delta_normal",
+            "exceptions": 6,
+            "exception_rate": 0.009630818619582664,
+            "mean_var_99": 162104.51723322633
+          },
+          {
+            "method": "delta_gamma",
+            "exceptions": 5,
+            "exception_rate": 0.008025682182985553,
+            "mean_var_99": 167492.75122070627
+          },
+          {
+            "method": "mc_normal",
+            "exceptions": 5,
+            "exception_rate": 0.008025682182985553,
+            "mean_var_99": 171491.90135569824
+          },
+          {
+            "method": "mc_t",
+            "exceptions": 4,
+            "exception_rate": 0.006420545746388443,
+            "mean_var_99": 196132.72470786516
+          }
+        ]
+      },
+      {
+        "id": "at_least_20",
+        "label": "VIX 20 or higher",
+        "days": 127,
+        "models": [
+          {
+            "method": "historical",
+            "exceptions": 5,
+            "exception_rate": 0.03937007874015748,
+            "mean_var_99": 227173.7256992126
+          },
+          {
+            "method": "delta_normal",
+            "exceptions": 6,
+            "exception_rate": 0.047244094488188976,
+            "mean_var_99": 158507.52773385827
+          },
+          {
+            "method": "delta_gamma",
+            "exceptions": 6,
+            "exception_rate": 0.047244094488188976,
+            "mean_var_99": 162664.37711653544
+          },
+          {
+            "method": "mc_normal",
+            "exceptions": 6,
+            "exception_rate": 0.047244094488188976,
+            "mean_var_99": 166127.02463543307
+          },
+          {
+            "method": "mc_t",
+            "exceptions": 5,
+            "exception_rate": 0.03937007874015748,
+            "mean_var_99": 188997.3697023622
+          }
+        ]
+      }
+    ]
+  }
+}

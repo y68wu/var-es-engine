@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A four-week development walkthrough for the CAD multi-asset VaR and expected-shortfall engine.">
+  <meta name="theme-color" content="#091420">
+  <title>Project Handbook · Risk Lab</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/handbook.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to handbook</a>
+  <header class="header">
+    <nav class="container" aria-label="Main navigation">
+      <a class="wordmark" href="index.html" aria-label="Mark Risk Lab home"><img src="assets/mark.svg" alt="" width="28" height="28"><strong>MARK<span>/</span></strong> RISK LAB</a>
+      <a href="index.html#model-lab">Model lab</a>
+      <a href="index.html#backtest">Backtest</a>
+      <a href="index.html#stress">Stress</a>
+      <a href="index.html#data">Data</a>
+      <a href="handbook.html" aria-current="page">Handbook</a>
+      <a href="https://github.com/y68wu/var-es-engine">Source code <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="title">
+      <div class="container">
+        <p class="eyebrow">CAD multi-asset VaR / ES · Build record</p>
+        <h1 id="title">Project handbook</h1>
+        <p class="intro">Follow the build from the first option price to the published risk dashboard. Each day pairs an implementation decision with a check and a traceable project artifact.</p>
+        <div class="hero-facts" aria-label="Handbook scope">
+          <span><strong>04</strong> weeks</span>
+          <span><strong>28</strong> calendar entries</span>
+          <span><strong>OCT 11 – NOV 07</strong> / 2026</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="container content">
+      <nav class="toc" aria-label="Handbook weeks">
+        <p class="eyebrow">Contents</p>
+        <ol>
+          <li><a class="week-link" href="#week-1"><span>01</span> Price the book</a></li>
+          <li><a class="week-link" href="#week-2"><span>02</span> Estimate the tail</a></li>
+          <li><a class="week-link" href="#week-3"><span>03</span> Challenge estimates</a></li>
+          <li><a class="week-link" href="#week-4"><span>04</span> Document and publish</a></li>
+        </ol>
+      </nav>
+
+      <div class="entries">
+        <p class="calendar-note"><strong>Calendar note.</strong> The dates are illustrative. This reconstructed walkthrough follows the order of the technical work. Measured sample and backtest dates appear separately in the analysis.</p>
+        <section class="week" id="week-1" aria-labelledby="week-1-title">
+          <header class="week-header">
+            <p class="eyebrow">Week 01 · Oct 11–Oct 17</p>
+            <h2 id="week-1-title">Price the book</h2>
+            <p>Define the exposures, align public observations and validate the instruments before estimating a loss distribution.</p>
+          </header>
+          <article class="day" id="day-01">
+            <div class="day-stamp">
+              <span class="label">Day 01</span>
+              <time datetime="2026-10-11">Oct 11 · Sun</time>
+            </div>
+            <div>
+              <h3>Define the reference book</h3>
+              <p>Size the CAD 10M book at CAD 5M in XIU, CAD 3M in a 5Y GoC bond and CAD 2M in a 10Y GoC bond. Sell a 3M USD/CAD call and put at the same spot-ATM strike, with USD 15M notional per leg. Retain the premium as CAD cash.</p>
+              <p><strong>Check.</strong> Check that the cash and option liability offset at inception and that opening NAV ties to CAD 10M.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/portfolio.py">Portfolio construction ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-02">
+            <div class="day-stamp">
+              <span class="label">Day 02</span>
+              <time datetime="2026-10-12">Oct 12 · Mon</time>
+            </div>
+            <div>
+              <h3>Specify the input feeds</h3>
+              <p>Map XIU and USD/CAD closes to Yahoo Finance, GoC zero yields and CORRA to the Bank of Canada, and the 3M U.S. Treasury rate to FRED. Set prices, rates and volatility to consistent units. Treat CAD per USD as the spot quote.</p>
+              <p><strong>Check.</strong> Record series names, sample dates and a checksum for the locally downloaded panel.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/data/README.md">Data dictionary ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-03">
+            <div class="day-stamp">
+              <span class="label">Day 03</span>
+              <time datetime="2026-10-13">Oct 13 · Tue</time>
+            </div>
+            <div>
+              <h3>Align closes without filling risky inputs</h3>
+              <p>Intersect the observed equity, FX and GoC curve dates. Attach the latest strictly prior CORRA and DGS3MO observations within seven calendar days. Preserve the distinction between observation date and publication date for the lagged GoC curve.</p>
+              <p><strong>Check.</strong> Use a small fixture with a missing close and same-day carry observations to verify the joint calendar and strictly prior rate matching.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_market.py">Market alignment tests ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-04">
+            <div class="day-stamp">
+              <span class="label">Day 04</span>
+              <time datetime="2026-10-14">Oct 14 · Wed</time>
+            </div>
+            <div>
+              <h3>Build the FX volatility proxy</h3>
+              <p>Compute USD/CAD log returns and seed daily variance with the first 30 squared returns. Update variance with 0.94 persistence and annualize with 252 sessions. Feed the resulting realized-volatility proxy to the option model.</p>
+              <p><strong>Check.</strong> Check the seed and next recursive update by hand, and make sure later observations cannot change earlier volatility values.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/market.py">EWMA implementation ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-05">
+            <div class="day-stamp">
+              <span class="label">Day 05</span>
+              <time datetime="2026-10-15">Oct 15 · Thu</time>
+            </div>
+            <div>
+              <h3>Implement European FX option pricing</h3>
+              <p>Use Garman–Kohlhagen with the CAD proxy as domestic carry and the USD proxy as foreign carry. Price the call and put independently. Derive spot delta, gamma, vega and theta, with additional curvature terms for joint FX and volatility moves.</p>
+              <p><strong>Check.</strong> Compare the four primary Greeks with finite differences. Verify put–call parity and intrinsic value at expiry.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/pricing.py">FX pricing and Greeks ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-06">
+            <div class="day-stamp">
+              <span class="label">Day 06</span>
+              <time datetime="2026-10-16">Oct 16 · Fri</time>
+            </div>
+            <div>
+              <h3>Discount the two GoC cash-flow schedules</h3>
+              <p>Construct semiannual coupons and principal for synthetic 5Y and 10Y bonds. Interpolate zero rates across the five available knots and discount each flow at its own tenor. Compute parallel DV01 and convexity, and isolate 5Y and 10Y key-rate exposures.</p>
+              <p><strong>Check.</strong> Check that the par coupon prices each opening bond at face value. Bump the curve to verify the direction and magnitude of local rate sensitivities.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/sensitivities.csv">Position sensitivities ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-07">
+            <div class="day-stamp">
+              <span class="label">Day 07</span>
+              <time datetime="2026-10-17">Oct 17 · Sat</time>
+            </div>
+            <div>
+              <h3>Assemble daily marks and shock repricing</h3>
+              <p>Combine equity, bonds, FX options and cash in one valuation interface. Keep position sizes fixed within a historical test. Reset the strike for each risk snapshot and hold the strike fixed when measuring the following shock.</p>
+              <p><strong>Check.</strong> Compare the vectorized repricer against individual valuations. Keep daily snapshot marks separate from held one-day P&amp;L with carry and elapsed time.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_pricing.py">Portfolio valuation tests ↗</a>
+            </div>
+          </article>
+        </section>
+
+        <section class="week" id="week-2" aria-labelledby="week-2-title">
+          <header class="week-header">
+            <p class="eyebrow">Week 02 · Oct 18–Oct 24</p>
+            <h2 id="week-2-title">Estimate the tail</h2>
+            <p>Build four model families on the same five-factor shock convention and isolate what changes when option curvature enters the valuation.</p>
+          </header>
+          <article class="day" id="day-08">
+            <div class="day-stamp">
+              <span class="label">Day 08</span>
+              <time datetime="2026-10-18">Oct 18 · Sun</time>
+            </div>
+            <div>
+              <h3>Define the shock vector and loss sign</h3>
+              <p>Use log moves for XIU and USD/CAD, and absolute decimal changes for the 5Y and 10Y zero yields and FX volatility. Keep short-end curve knots, funding proxies and tenor fixed within modeled shocks. Express risk as positive CAD losses.</p>
+              <p><strong>Check.</strong> Verify all five factor coordinates against finite differences of the portfolio, including the FX-volatility cross term.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/portfolio.py">Factor mapping and repricing ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-09">
+            <div class="day-stamp">
+              <span class="label">Day 09</span>
+              <time datetime="2026-10-19">Oct 19 · Mon</time>
+            </div>
+            <div>
+              <h3>Implement historical simulation</h3>
+              <p>Revalue the held portfolio under each of the preceding 500 observed joint shock vectors. Read 99% VaR from the empirical loss quantile and compute 97.5% ES by averaging the upper tail with fractional mass where the cutoff crosses a sample point.</p>
+              <p><strong>Check.</strong> Test fractional tail weighting and document that only about five observations lie beyond the historical 99% threshold.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_risk.py">Historical risk and tail tests ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-10">
+            <div class="day-stamp">
+              <span class="label">Day 10</span>
+              <time datetime="2026-10-20">Oct 20 · Tue</time>
+            </div>
+            <div>
+              <h3>Implement the delta-normal benchmark</h3>
+              <p>Project the sample shock mean and covariance through the portfolio gradient. Use the resulting normal distribution for the loss quantile and tail average. This gives a baseline with the same calibration as Gaussian simulation.</p>
+              <p><strong>Check.</strong> Compare with the closed form for a linear exposure. Add an at-zero-delta short-gamma case where a linear model misses the quadratic loss.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/risk.py">Delta-normal risk ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-11">
+            <div class="day-stamp">
+              <span class="label">Day 11</span>
+              <time datetime="2026-10-21">Oct 21 · Wed</time>
+            </div>
+            <div>
+              <h3>Add the delta-gamma approximation</h3>
+              <p>Build a quadratic loss approximation from the gradient and Hessian. Compute its cumulants under Gaussian shocks and adjust the quantile with Cornish–Fisher. Sort the adjusted quantile grid when the approximation is nonmonotone.</p>
+              <p><strong>Check.</strong> Use a noncentral chi-square case to check the quadratic cumulants with a nonzero shock mean. Check behavior when Cornish–Fisher needs rearrangement.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_risk.py">Delta-gamma and quantile tests ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-12">
+            <div class="day-stamp">
+              <span class="label">Day 12</span>
+              <time datetime="2026-10-22">Oct 22 · Thu</time>
+            </div>
+            <div>
+              <h3>Simulate Gaussian shocks</h3>
+              <p>Correlate 10,000 standard normal draws with the Cholesky factor of the estimated covariance and apply full repricing to every path. Reuse seeded base draws for comparisons across dates and valuation methods.</p>
+              <p><strong>Check.</strong> Check the fallback for a singular covariance matrix so deterministic factor directions retain zero variance.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/src/var_es/risk.py">Simulation engine ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-13">
+            <div class="day-stamp">
+              <span class="label">Day 13</span>
+              <time datetime="2026-10-23">Oct 23 · Fri</time>
+            </div>
+            <div>
+              <h3>Simulate joint Student-t shocks</h3>
+              <p>Give the Gaussian innovations a common per-path Student-t scale with six degrees of freedom. Rescale to match the Gaussian covariance. Run the same full repricer so the comparison isolates the joint shock distribution.</p>
+              <p><strong>Check.</strong> Verify the shared path scale and covariance adjustment. Label Gaussian and Student-t as two variants of one Monte Carlo model family.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_risk.py">Student-t scaling test ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-14">
+            <div class="day-stamp">
+              <span class="label">Day 14</span>
+              <time datetime="2026-10-24">Oct 24 · Sat</time>
+            </div>
+            <div>
+              <h3>Isolate the impact of the short straddle</h3>
+              <p>Compare linear and full-revaluation VaR on identical Gaussian paths. Repeat with the same equity and bond book and the option position removed. The paired VaR shortfall is 2.6% with the straddle. Linear VaR is slightly higher in the control.</p>
+              <p><strong>Check.</strong> Keep the paired result separate from the 4.3% gap between analytical delta-normal and simulated full revaluation.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/comparison.csv">Paired Gaussian comparison ↗</a>
+            </div>
+          </article>
+        </section>
+
+        <section class="week" id="week-3" aria-labelledby="week-3-title">
+          <header class="week-header">
+            <p class="eyebrow">Week 03 · Oct 25–Oct 31</p>
+            <h2 id="week-3-title">Challenge the estimates</h2>
+            <p>Run a strictly out-of-sample forecast loop, test coverage and clustering, then replay crisis shocks on the report-date portfolio.</p>
+          </header>
+          <article class="day" id="day-15">
+            <div class="day-stamp">
+              <span class="label">Day 15</span>
+              <time datetime="2026-10-25">Oct 25 · Sun</time>
+            </div>
+            <div>
+              <h3>Freeze the rolling forecast protocol</h3>
+              <p>Backtest 750 realization dates from October 11, 2023 through October 21, 2026. For each date, fit all model variants to the preceding 500 aligned shocks. Form the portfolio snapshot from the prior observation, then score the next realized shock.</p>
+              <p><strong>Check.</strong> Assert that the training slice excludes the realization. Count an exception only when the realized loss strictly exceeds forecast VaR.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_backtest.py">Forecast timing tests ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-16">
+            <div class="day-stamp">
+              <span class="label">Day 16</span>
+              <time datetime="2026-10-26">Oct 26 · Mon</time>
+            </div>
+            <div>
+              <h3>Measure unconditional coverage</h3>
+              <p>Count 99% VaR exceptions for each model and compare the observed frequency against 1% using the Kupiec likelihood ratio. Keep the count, rate, statistic and p-value in the same diagnostics table.</p>
+              <p><strong>Check.</strong> Review the probability-boundary fixtures, including all-hit and no-hit sequences. Compare 12 delta-normal breaches with 8 historical simulation breaches.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/diagnostics.csv">Coverage diagnostics ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-17">
+            <div class="day-stamp">
+              <span class="label">Day 17</span>
+              <time datetime="2026-10-27">Oct 27 · Tue</time>
+            </div>
+            <div>
+              <h3>Test for clustered exceptions</h3>
+              <p>Build the four no-hit/hit transition counts for each model. Apply the Christoffersen independence and conditional coverage tests to see whether exceedances arrive independently and at the target frequency.</p>
+              <p><strong>Check.</strong> Use a fixture with equal exception counts but different ordering. In the empirical sample, all five variants flag clustering at 5%.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/tests/test_backtest.py">Transition and likelihood tests ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-18">
+            <div class="day-stamp">
+              <span class="label">Day 18</span>
+              <time datetime="2026-10-28">Oct 28 · Wed</time>
+            </div>
+            <div>
+              <h3>Apply the 250-day traffic light</h3>
+              <p>Classify the final 250 forecasts using Basel-style bands of 0–4 green, 5–9 amber and at least 10 red. All five variants fall in the green band. Keep the full-period independence result visible alongside the traffic light.</p>
+              <p><strong>Check.</strong> Check the four band boundaries and verify that earlier exceptions do not enter the final-250 count.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/diagnostics.csv">Traffic-light diagnostics ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-19">
+            <div class="day-stamp">
+              <span class="label">Day 19</span>
+              <time datetime="2026-10-29">Oct 29 · Thu</time>
+            </div>
+            <div>
+              <h3>Trace the nonlinear payoff</h3>
+              <p>Hold other factors constant and sweep USD/CAD spot up and down. Plot exact, delta-only and delta-gamma P&amp;L. At a +2% move, delta alone gives a CAD 69.7k gain while full repricing gives a CAD 73.7k loss.</p>
+              <p><strong>Check.</strong> Check the zero-shock origin and show where a local quadratic begins to overstate the loss at larger moves.</p>
+              <a class="artifact" href="index.html#model-lab">Open the model lab →</a>
+            </div>
+          </article>
+          <article class="day" id="day-20">
+            <div class="day-stamp">
+              <span class="label">Day 20</span>
+              <time datetime="2026-10-30">Oct 30 · Fri</time>
+            </div>
+            <div>
+              <h3>Replay observed crises</h3>
+              <p>Apply historical spot, rate and volatility changes since each episode’s preceding close to the same report-date book. Replay September–November 2008, March 2020 and calendar 2022 at fixed strike and tenor.</p>
+              <p><strong>Check.</strong> Record end-of-period P&amp;L and worst observed close separately. The 2008 replay’s worst close gives a CAD 6.16M loss.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/stress.csv">Historical stress results ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-21">
+            <div class="day-stamp">
+              <span class="label">Day 21</span>
+              <time datetime="2026-10-31">Oct 31 · Sat</time>
+            </div>
+            <div>
+              <h3>Run individual and combined stresses</h3>
+              <p>Bump the CAD curve and CAD option carry proxy by 200 bp, depreciate the CAD by 10% in USD terms, and double FX volatility. Apply the shocks separately and then reprice their combined effect.</p>
+              <p><strong>Check.</strong> Translate the CAD depreciation to an 11.11% increase in USD/CAD. Reconcile total and position-level P&amp;L for the CAD 2.51M combined loss.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/reports/stress.csv">Hypothetical stress results ↗</a>
+            </div>
+          </article>
+        </section>
+
+        <section class="week" id="week-4" aria-labelledby="week-4-title">
+          <header class="week-header">
+            <p class="eyebrow">Week 04 · Nov 01–Nov 07</p>
+            <h2 id="week-4-title">Document and publish</h2>
+            <p>Extend the data context, explain model boundaries and turn the empirical study into a reproducible public demonstration.</p>
+          </header>
+          <article class="day" id="day-22">
+            <div class="day-stamp">
+              <span class="label">Day 22</span>
+              <time datetime="2026-11-01">Nov 01 · Sun</time>
+            </div>
+            <div>
+              <h3>Document valuation conventions</h3>
+              <p>Separate the one-day forecast loss, realized hypothetical backtest loss and held one-day carry-inclusive P&amp;L. Explain why the bond tenors are refreshed for a new snapshot and why that mark series is distinct from an investable roll strategy.</p>
+              <p><strong>Check.</strong> Tie the definitions back to the analysis code and note the flat carry proxies, the lack of a volatility smile and the BoC publication lag.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/README.md">Methods and limitations ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-23">
+            <div class="day-stamp">
+              <span class="label">Day 23</span>
+              <time datetime="2026-11-02">Nov 02 · Mon</time>
+            </div>
+            <div>
+              <h3>Cross-check the FX feed</h3>
+              <p>Pull the Bank of Canada Valet FXUSDCAD series as an independent daily CAD-per-USD reference. Compare overlap, daily return correlation and gaps against Yahoo on matched observations. Keep the existing valuation feed unchanged.</p>
+              <p><strong>Check.</strong> The same-date return correlation is 0.37 across the common return sample. Comparing the BoC return with the next matched Yahoo session raises correlation to 0.75 on a common comparison slice, a timing diagnostic consistent with different observation windows. The Yahoo date labels in the model stay as supplied.</p>
+              <a class="artifact" href="index.html#data">Market context →</a>
+            </div>
+          </article>
+          <article class="day" id="day-24">
+            <div class="day-stamp">
+              <span class="label">Day 24</span>
+              <time datetime="2026-11-03">Nov 03 · Tue</time>
+            </div>
+            <div>
+              <h3>Inspect a market-volatility regime split</h3>
+              <p>Download CBOE VIX from FRED and match each test date to the latest strictly prior observation within seven days. Split the existing backtest at VIX 20 and compare exception counts and rates by regime.</p>
+              <p><strong>Check.</strong> Delta-normal breaches on 6 of 623 days below VIX 20 and 6 of 127 days at or above it. This post-hoc split describes the backtest. VIX measures U.S. equity implied volatility and stays outside the risk factors.</p>
+              <a class="artifact" href="index.html#data">Market context →</a>
+            </div>
+          </article>
+          <article class="day" id="day-25">
+            <div class="day-stamp">
+              <span class="label">Day 25</span>
+              <time datetime="2026-11-04">Nov 04 · Wed</time>
+            </div>
+            <div>
+              <h3>Write the analytical handoff</h3>
+              <p>Package the one-day risk snapshot, the paired Gaussian comparison, coverage diagnostics and stress outputs. Present the difference between a model’s total exceptions, their clustering and its final-250 classification.</p>
+              <p><strong>Check.</strong> Link the notebook and summary tables to the underlying scripts and include commands for a fresh clone to reproduce the study.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/blob/main/notebooks/01_case_study.ipynb">Analysis notebook ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-26">
+            <div class="day-stamp">
+              <span class="label">Day 26</span>
+              <time datetime="2026-11-05">Nov 05 · Thu</time>
+            </div>
+            <div>
+              <h3>Turn the results into an interactive model lab</h3>
+              <p>Expose the FX shock sweep alongside the model comparison and stress explorer. Use the Python engine’s computed outputs so the website and report share the same numbers.</p>
+              <p><strong>Check.</strong> Check the sign conventions, shock bounds and readable chart labels. Make the controls usable with a keyboard.</p>
+              <a class="artifact" href="index.html">Interactive showcase →</a>
+            </div>
+          </article>
+          <article class="day" id="day-27">
+            <div class="day-stamp">
+              <span class="label">Day 27</span>
+              <time datetime="2026-11-06">Nov 06 · Fri</time>
+            </div>
+            <div>
+              <h3>Review the test suite and release inputs</h3>
+              <p>Run pricing, alignment, simulation and backtest tests together. Confirm the website uses derived results and study metadata. Keep the full raw-price panel in the local workspace.</p>
+              <p><strong>Check.</strong> Verify the clean-checkout instructions and confirm the published files do not include credentials or local market caches.</p>
+              <a class="artifact" href="https://github.com/y68wu/var-es-engine/actions">Repository test runs ↗</a>
+            </div>
+          </article>
+          <article class="day" id="day-28">
+            <div class="day-stamp">
+              <span class="label">Day 28</span>
+              <time datetime="2026-11-07">Nov 07 · Sat</time>
+            </div>
+            <div>
+              <h3>Publish the project and handbook</h3>
+              <p>Serve the public demonstration from the repository and connect the README, the live model lab and this development walkthrough. Give visitors a path from each empirical claim to the supporting table or implementation.</p>
+              <p><strong>Check.</strong> Check the deployed dashboard, the four-week navigation and the GitHub links on a narrow and a wide screen.</p>
+              <a class="artifact" href="index.html">Return to the dashboard →</a>
+            </div>
+          </article>
+        </section>
+
+
+        <div class="next">
+          <p>Explore the same portfolio in the interactive study.</p>
+          <a href="index.html#model-lab">Open the model lab →</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <a class="wordmark" href="index.html" aria-label="Mark Risk Lab home"><img src="assets/mark.svg" alt="" width="26" height="26"><strong>MARK<span>/</span></strong> RISK LAB</a>
+      <a href="https://github.com/y68wu/var-es-engine">Source repository ↗</a>
+    </div>
+  </footer>
+</body>
+</html>
