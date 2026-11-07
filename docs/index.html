@@ -26,6 +26,7 @@
         <a href="#backtest">Backtest</a>
         <a href="#stress">Stress</a>
         <a href="#data">Data</a>
+        <a class="nav-sim" href="simulator.html">Simulator</a>
         <a href="handbook.html">Handbook</a>
       </nav>
       <a class="nav-repo" href="https://github.com/y68wu/var-es-engine">Source code <span aria-hidden="true">↗</span></a>
@@ -40,8 +41,8 @@
           <h1 id="hero-title">Market risk<br>under <em>pressure.</em></h1>
           <p class="hero-deck">A multi-asset VaR and Expected Shortfall engine for a CAD 10M portfolio. Explore what happens when a short USD/CAD straddle bends the loss curve.</p>
           <div class="hero-actions">
-            <a class="button button-mint" href="#model-lab">Explore the model <span aria-hidden="true">↓</span></a>
-            <a class="text-link hero-link" href="handbook.html">Read the build handbook <span aria-hidden="true">↗</span></a>
+            <a class="button button-mint" href="simulator.html">Open trading simulator <span aria-hidden="true">↗</span></a>
+            <a class="text-link hero-link" href="#model-lab">Explore the model <span aria-hidden="true">↓</span></a>
           </div>
         </div>
         <figure class="terminal">
@@ -140,7 +141,7 @@
             <div class="segmented dark-segmented" role="group" aria-label="Scenario group"><button data-scenario-group="historical" aria-pressed="true" type="button">Historical</button><button data-scenario-group="hypothetical" aria-pressed="false" type="button">Hypothetical</button></div>
             <div id="scenario-buttons" class="scenario-buttons" aria-label="Scenarios"></div>
           </div>
-          <article class="stress-result" aria-labelledby="scenario-name">
+          <article class="stress-result" aria-labelledby="scenario-name" aria-live="polite">
             <div class="card-heading"><span class="micro" id="scenario-label">WORST CLOSE REPLAY</span><span class="chip" id="scenario-date">NOV 20, 2008</span></div>
             <h3 id="scenario-name">Global financial crisis</h3>
             <div class="stress-total" id="scenario-total">−$6.16M</div>

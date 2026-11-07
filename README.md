@@ -1,6 +1,6 @@
 # CAD multi-asset VaR / ES engine
 
-[Open the interactive case study](https://y68wu.github.io/var-es-engine/) · [Read the four-week project handbook](https://y68wu.github.io/var-es-engine/handbook.html)
+[Open the interactive case study](https://y68wu.github.io/var-es-engine/) · [Try the paper trading desk](https://y68wu.github.io/var-es-engine/simulator.html) · [Read the four-week project handbook](https://y68wu.github.io/var-es-engine/handbook.html)
 
 **Delta-normal put 99% one-day VaR at CAD 125.7k, 4.3% below Gaussian full revaluation (CAD 131.2k).** On identical Gaussian paths, linear P&L gave CAD 127.9k versus CAD 131.2k with full revaluation. In the control book without options, linear P&L slightly overstated VaR. The snapshot uses the October 21, 2026 close.
 
@@ -84,6 +84,8 @@ Using the most recent prior VIX close and an illustrative threshold of 20, reali
 ## Website
 
 GitHub Pages serves the static files in `docs/`. The case study uses the committed summary tables and a precomputed grid of exact portfolio valuations for its FX shock lab. The four-week handbook maps 28 illustrative calendar dates to decisions, implementation steps and checks in the repository.
+
+The paper trading desk starts with CAD 100,000 in simulated cash. Buy and sell XIU or sell and buy back a 3M USD/CAD straddle, then step through one of three reproducible synthetic paths. The sample trade opens 400 XIU units and sells one straddle before replaying the market. The desk marks positions with Garman–Kohlhagen and reports cumulative P&L, cash, exposure and four instantaneous stress scenarios. The simulator uses a fixed cash reserve and excludes fees and live execution. The CAD 10M empirical study uses a separate portfolio and dataset.
 
 After running the analysis above, regenerate the supplementary report and the site's data file.
 

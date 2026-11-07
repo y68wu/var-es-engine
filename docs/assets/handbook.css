@@ -57,6 +57,14 @@ p { margin: 0; }
 .week-link:hover { color: var(--mint-dark); text-decoration: underline; }
 .week-link span { color: var(--mint-dark); }
 .calendar-note { padding: .8rem .95rem; border-left: 2px solid var(--mint-dark); background: #e7eee3; color: #2f4e46; font-size: .84rem; }
+.simulator-callout { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; margin-top: 1.2rem; padding: clamp(1.25rem, 3vw, 1.8rem); border-radius: .4rem; background: var(--panel); color: var(--white); }
+.simulator-callout > div { flex: 1 1 22rem; }
+.simulator-callout .eyebrow { color: var(--mint); }
+.simulator-callout h2 { margin: .3rem 0 .45rem; font: 800 clamp(1.45rem, 3vw, 1.85rem)/1.1 var(--heading); letter-spacing: -.035em; }
+.simulator-callout p:not(.eyebrow) { color: #c6d4db; font-size: .9rem; }
+.simulator-callout a { display: inline-flex; align-items: center; gap: .6rem; padding: .65rem .85rem; border-radius: .25rem; background: var(--mint); color: var(--ink); font-size: .83rem; font-weight: 700; text-decoration: none; }
+.simulator-callout a:hover { text-decoration: underline; }
+.simulator-callout a:focus-visible { outline-color: var(--mint); }
 .week { scroll-margin-top: 1.25rem; margin-top: 3.35rem; }
 .week-header { display: grid; gap: .2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--ink); }
 .week-header .eyebrow { color: var(--mint-dark); text-transform: uppercase; }
@@ -94,7 +102,7 @@ time { color: var(--muted); text-transform: uppercase; }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print {
-  .header, .toc, .next, .footer { display: none; }
+  .header, .toc, .next, .footer, .simulator-callout { display: none; }
   .hero { color: var(--ink); background: #fff; padding: 0 0 1rem; }
   .hero::before, .hero-facts { display: none; }
   .hero .eyebrow, .hero .intro { color: var(--ink); }

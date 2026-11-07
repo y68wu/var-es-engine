@@ -55,8 +55,9 @@ function drawShockChart(svg, curve, hero) {
   for (let v = low; v <= high; v += step) {
     const level = y(v);
     draw("line", { x1: bounds.left, x2: bounds.right, y1: level, y2: level, class: v === 0 ? "axis-zero" : "axis-grid" });
+    const label = Math.abs(v) >= 1e6 ? `${Math.abs(v / 1e6)}M` : `${Math.abs(v / 1000)}k`;
     draw("text", { x: bounds.left - 9, y: level + 4, "text-anchor": "end", class: "axis-label" },
-      v === 0 ? "$0" : `${v < 0 ? "−" : "+"}$${Math.abs(v / 1000)}k`);
+      v === 0 ? "$0" : `${v < 0 ? "−" : "+"}$${label}`);
   }
   for (const tick of xTicks) {
     const position = x(tick / 100);
@@ -158,6 +159,9 @@ function buildModelComparison(snapshot, diagnostics, market) {
     const max = Math.max(...rows.map((row) => row[measure])) * 1.05;
     rowButtons.forEach((row, i) => {
       const value = rows[i][measure];
+      const bar = row.querySelector(".model-bar");
+      bar.classList.toggle("with-benchmark", count);
+      bar.style.setProperty("--benchmark", `${(7.5 / max) * 100}%`);
       row.querySelector(".model-fill").style.width = `${(value / max) * 100}%`;
       row.querySelector("strong").textContent = count ? `${value} / 750` : cad(value);
     });

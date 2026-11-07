@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091420">
+  <meta name="description" content="Practice trading XIU and USD/CAD straddles, then inspect the portfolio impact under simulated market shocks.">
+  <title>Paper trading desk — MARK / Risk Lab</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/simulator.css">
+  <script src="assets/simulator.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to trading desk</a>
+  <header class="site-header">
+    <div class="shell nav-wrap">
+      <a class="brand" href="./" aria-label="Mark Risk Lab home"><img src="assets/mark.svg" alt="" width="28" height="28"><strong>MARK<span>/</span></strong> RISK LAB</a>
+      <nav aria-label="Main navigation">
+        <a href="./">Overview</a><a href="index.html#model-lab">Model lab</a>
+        <a href="simulator.html" aria-current="page">Simulator</a><a href="handbook.html">Handbook</a>
+      </nav>
+      <a class="nav-repo" href="https://github.com/y68wu/var-es-engine">Source code <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main" class="sim-page">
+    <div class="shell">
+      <div class="sim-heading">
+        <div>
+          <p class="kicker"><span class="status-dot"></span> Practice environment <span class="kicker-sep">/</span> Research terminal</p>
+          <h1>Paper trading desk<span>.</span></h1>
+          <p>Place a simulated order, advance the market and watch the book reprice. Trade XIU for equity exposure or sell a USD/CAD straddle to see short gamma in the account.</p>
+        </div>
+        <button type="button" id="sim-demo" class="button button-mint">Run sample trade <span aria-hidden="true">↗</span></button>
+      </div>
+
+      <div class="sim-summary" aria-label="Account snapshot">
+        <div><span class="micro">NET LIQUIDATION</span><strong id="sim-nav">—</strong><span>Portfolio value</span></div>
+        <div><span class="micro">AVAILABLE CASH</span><strong id="sim-cash">—</strong><span>After cash reserve</span></div>
+        <div><span class="micro">TOTAL P&amp;L</span><strong id="sim-pnl">—</strong><span>Change since reset</span></div>
+        <div><span class="micro">STRESS P&amp;L</span><strong id="sim-stress">—</strong><span id="sim-stress-note">USD/CAD +2% · spot only</span></div>
+        <div><span class="micro">FX GAMMA</span><strong id="sim-gamma">—</strong><span>Net straddle exposure</span></div>
+      </div>
+
+      <div class="sim-workspace">
+        <section class="sim-panel sim-market" aria-labelledby="market-title">
+          <div class="sim-panel-top">
+            <div>
+              <span class="micro">01 / REPLAY ENGINE</span>
+              <h2 id="market-title">Market replay</h2>
+            </div>
+            <div class="sim-replay-input">
+              <label class="micro" for="sim-mode">SCENARIO</label>
+              <select id="sim-mode" aria-describedby="sim-mode-note"></select>
+            </div>
+          </div>
+          <div class="sim-quote-strip">
+            <div><span class="micro">XIU <small>/ CAD</small></span><strong id="sim-equity">—</strong></div>
+            <div><span class="micro">USD/CAD</span><strong id="sim-spot">—</strong></div>
+            <div class="sim-day"><span class="micro" id="sim-step">SESSION —</span><strong id="sim-clock">—</strong></div>
+          </div>
+          <div class="sim-chart-tools">
+            <span id="sim-chart-caption" class="micro">REPLAY CHART</span>
+            <div class="segmented dark-segmented" role="group" aria-label="Replay chart series">
+              <button data-sim-chart="market" aria-pressed="true" type="button">Market</button>
+              <button data-sim-chart="nav" aria-pressed="false" type="button">Account NAV</button>
+            </div>
+          </div>
+          <div class="sim-chart-wrap">
+            <svg id="sim-chart" viewBox="0 0 760 270" role="img" aria-label="Market paths for the selected paper trading session"></svg>
+          </div>
+          <div class="sim-transport">
+            <div>
+              <button type="button" class="sim-control sim-primary" id="sim-run">Play</button>
+              <button type="button" class="sim-control" id="sim-next">Next session</button>
+              <button type="button" class="sim-control" id="sim-reset">Reset</button>
+            </div>
+            <p id="sim-mode-note">Choose a scenario to start a repeatable market path.</p>
+          </div>
+        </section>
+
+        <section class="sim-panel sim-ticket" aria-labelledby="ticket-title">
+          <div class="sim-panel-top">
+            <div><span class="micro">02 / EXECUTION</span><h2 id="ticket-title">Order ticket</h2></div>
+            <span class="sim-chip">MARKET</span>
+          </div>
+          <form id="sim-order">
+            <label for="sim-instrument"><span class="micro">INSTRUMENT</span>
+              <select id="sim-instrument" required><option value="xiu">XIU · Canadian equities</option><option value="straddle">USD/CAD · 3M straddle</option></select>
+            </label>
+            <div class="sim-order-fields">
+              <label for="sim-side"><span class="micro">SIDE</span>
+                <select id="sim-side" required><option value="buy">Buy</option><option value="sell">Sell</option></select>
+              </label>
+              <label for="sim-qty"><span class="micro">QUANTITY</span>
+                <input type="number" id="sim-qty" min="1" step="1" value="100" required>
+              </label>
+            </div>
+            <p class="sim-ticket-unit" id="sim-ticket-unit">XIU quantity is measured in shares.</p>
+            <div class="sim-order-preview" id="sim-preview" aria-live="polite">The current quote determines the simulated fill.</div>
+            <button id="sim-submit" class="button button-mint" type="submit">Place paper order <span aria-hidden="true">↗</span></button>
+          </form>
+          <p class="sim-ticket-note">Illustrative orders fill within this research simulator. No brokerage connection or money movement.</p>
+        </section>
+      </div>
+
+      <div id="sim-status" class="sim-status" role="status" aria-live="polite">Select a scenario or run the sample trade.</div>
+
+      <div class="sim-books">
+        <section class="sim-panel" aria-labelledby="positions-title">
+          <div class="sim-panel-top"><div><span class="micro">03 / INVENTORY</span><h2 id="positions-title">Positions</h2></div><span class="sim-chip">CAD</span></div>
+          <div class="sim-table-wrap">
+            <table>
+              <thead><tr><th scope="col">Instrument</th><th scope="col">Position</th><th scope="col">Mark</th><th scope="col">Value</th></tr></thead>
+              <tbody id="sim-positions"><tr><td colspan="4">No open trades</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="sim-panel" aria-labelledby="blotter-title">
+          <div class="sim-panel-top"><div><span class="micro">04 / BLOTTER</span><h2 id="blotter-title">Trade log</h2></div><span class="sim-chip">THIS SESSION</span></div>
+          <div class="sim-table-wrap">
+            <table>
+              <thead><tr><th scope="col">Session</th><th scope="col">Order</th><th scope="col">Qty</th><th scope="col">Fill</th><th scope="col">Cash impact</th></tr></thead>
+              <tbody id="sim-trades"><tr><td colspan="5">No fills yet</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <details class="sim-panel sim-shocks">
+        <summary>Inspect all instantaneous stress scenarios</summary>
+        <div class="sim-table-wrap">
+          <table>
+            <thead><tr><th scope="col">Scenario</th><th scope="col">Portfolio P&amp;L (CAD)</th></tr></thead>
+            <tbody id="sim-shocks"><tr><td colspan="2">No positions to stress</td></tr></tbody>
+          </table>
+        </div>
+      </details>
+
+      <aside class="sim-method" aria-label="Paper trading assumptions">
+        <span class="micro">ABOUT THE DESK</span>
+        <div>
+          <p>Each replay contains 30 synthetic market sessions. The 3M European USD/CAD straddle uses the initial at-the-money strike. Each straddle contract covers USD 100,000 per leg. Sell to open or buy to cover.</p>
+          <p>The desk uses a fixed CAD 12,000 cash reserve per short contract and caps positions at five contracts. Fills omit fees and formal brokerage margin. Visit the <a href="index.html#model-lab">model lab</a> for the historical portfolio results and exact repricing curves.</p>
+        </div>
+      </aside>
+      <noscript><p class="data-error">Enable JavaScript to use the paper trading simulator.</p></noscript>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="shell footer-wrap">
+      <a class="brand" href="./"><img src="assets/mark.svg" alt="" width="26" height="26"><strong>MARK<span>/</span></strong> RISK LAB</a>
+      <p>Portfolio research <span>·</span> CAD multi-asset risk</p>
+      <a href="https://github.com/y68wu/var-es-engine">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </footer>
+</body>
+</html>
